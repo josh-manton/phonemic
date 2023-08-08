@@ -2,12 +2,13 @@
 Rest API for Prosodic
 """
 import prosodic as pros
-from flask import Flask, request, make_response, render_template
+from flask import Blueprint, request, make_response, render_template
 from markupsafe import escape
 
-app = Flask(__name__)
+bp = Blueprint('analyze', __name__, url_prefix='/analyze')
 
-@app.route("/analyze/words/",  methods=['POST', 'GET'])
+
+@bp.route("words/",  methods=['POST', 'GET'])
 def analyze_words():
     """ Analyze Words """
     resp = []
@@ -43,12 +44,12 @@ def analyze_words():
             word_ipa.insert(j, child.str_ipa())
             word_shape.insert(j, child.getShape())
             word_segs.insert(j, seg)
-        
+
         resp.insert(i, ent)
     return resp
 
 
-@app.errorhandler(404)
+@bp.errorhandler(404)
 def not_found(error):
     """ Error """
     return make_response(render_template('404.html'), 404)
