@@ -21,6 +21,7 @@ platformdirs==3.10.0
 pox==0.3.3
 ppft==1.7.6.7
 prosodic @ git+https://github.com/quadrismegistus/prosodic.git@95a01036ec7b17787d3b16ac53f7080038176921
+-e git+https://github.com/josh-manton/prosodic-api.git@e25cdefee405b49d3a16326263e32daa2dd7ade3#egg=prosodic_api
 pylint==2.17.5
 pyparsing==3.1.1
 pyphen==0.14.0
