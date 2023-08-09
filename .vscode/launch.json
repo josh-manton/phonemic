@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "prosodic_api.app",
+                "FLASK_APP": "prosodic_api",
                 "FLASK_DEBUG": "1"
             },
             "args": [
