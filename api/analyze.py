@@ -1,6 +1,7 @@
 """
 Rest API for Prosodic
 """
+
 import prosodic as pros
 from flask import Blueprint, request, make_response, render_template
 from markupsafe import escape
