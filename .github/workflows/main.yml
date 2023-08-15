@@ -29,7 +29,7 @@ jobs:
         sudo ip link add dev wg0 type wireguard
         sudo ip address add dev wg0 10.189.152.219/32
         echo $privatekey        
-        sudo wg set wg0 listen-port 51820 private-key $privatekey peer $publickey allowed-ips 0.0.0.0/0 endpoint $endpoint
+        sudo wg set wg0 listen-port 51820 private-key "$privatekey" peer "$publickey" allowed-ips 0.0.0.0/0 endpoint "$endpoint"
     - name: Prepare SSH
       run: |
         mkdir ~/.ssh/
