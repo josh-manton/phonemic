@@ -24,6 +24,7 @@ jobs:
         publicKey: '${{ secrets.WIREGUARD_PUBLIC_KEY }}'
         endpoint: 'dj46kqhvz4e.d.firewalla.org:51820'      
       run: |
+        sudo apt update
         sudo apt install wireguard
         sudo ip link add dev wg0 type wireguard
         sudo ip address add dev wg0 10.189.152.219/32        
