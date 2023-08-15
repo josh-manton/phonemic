@@ -21,7 +21,7 @@ jobs:
     - name: Prepare Wireguard
       env: 
         privatekey: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
-        publicKey: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
+        publickey: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
         endpoint: 'dj46kqhvz4e.d.firewalla.org:51820'      
       run: |
         sudo apt update
