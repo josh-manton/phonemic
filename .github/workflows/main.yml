@@ -1,0 +1,34 @@
+name: Deploy on merge of pull request
+on:
+  pull_request_target:
+    types:
+      - closed
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo The PR was merged
+    # Runs a single command using the runners shell
+    - name: Prepare Wireguard
+      env: 
+        privatekey: '${{ secrets.WIREGUARD_PRIVATE_KEY }}' 
+        publicKey: '${{ secrets.WIREGUARD_PUBLIC_KEY }}'
+        endpoint: 'dj46kqhvz4e.d.firewalla.org:51820'      
+      run: |
+        sudo apt install wireguard
+        sudo ip link add dev wg0 type wireguard
+        sudo ip address add dev wg0 10.189.152.219/32        
+        sudo wg set wg0 listen-port 51820 private-key privatekey peer publickey allowed-ips 0.0.0.0/0 endpoint dj46kqhvz4e.d.firewalla.org:51820
+    - name: Prepare SSH
+      run: |
+        mkdir ~/.ssh/
+        echo "${{ secrets.PCU_SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+    - name: Trigger Deploy Script
+      run: |
+        sudo ip link set up dev wg0        
+        echo 'deploy script triggered
+        sudo ip link set up dev wg0  
