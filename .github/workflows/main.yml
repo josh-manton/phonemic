@@ -3,10 +3,16 @@ on:
   pull_request_target:
     types:
       - closed
-
+  workflow_dispatch:
+    inputs:
+      manual_run:
+        description: 'Manually Trigger Workflow'
+        required: true
+        type: boolean
+        default: true
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || inputs.manual_run == true
     runs-on: ubuntu-latest
     steps:
     - run: |
