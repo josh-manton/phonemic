@@ -33,7 +33,7 @@ jobs:
         [Peer]
         PublicKey=$publickey
         Endpoint=$endpoint
-        AllowedIPs=0.0.0.0/0
+        AllowedIPs=192.168.169.0/24
         EOT
         sudo mv wg.conf /etc/wireguard
     #- name: Prepare SSH
