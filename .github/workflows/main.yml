@@ -37,13 +37,13 @@ jobs:
         EOT
         sudo mv wg.conf /etc/wireguard
     - run: |
-        sudo wg-quick up wg || exit 1 
-    - name: SSH Command
-      uses: D3rHase/ssh-command-action@v0.2.2
+        sudo wg-quick up wg || exit 1
+    - name: ssh-job
+      uses: nekiro/ssh-job@v1.0.3
       with:
-        host:  192.168.169.6        
+        host: 192.168.169.6         
+        key: "${{ secrets.PCU_SSH_PRIVATE_KEY }}"            
         user: pyusr
-        private_key: "${{ secrets.PCU_SSH_PRIVATE_KEY }}"        
         command: whoami
     - run: |
         sudo wg-quick down wg || exit 1 
