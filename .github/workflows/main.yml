@@ -37,11 +37,11 @@ jobs:
         AllowedIPs=0.0.0.0/0
         EOT
         sudo mv wg.conf /etc/wireguard
-    - name: Prepare SSH
-      run: |
-        mkdir ~/.ssh/
-        echo "${{ secrets.PCU_SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+    #- name: Prepare SSH
+      #run: |
+      #  mkdir ~/.ssh/
+      #  echo "${{ secrets.PCU_SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa
+      #  chmod 600 ~/.ssh/id_rsa
     - name: Trigger Deploy Script
       run: |
         sudo wg-quick up wg || exit 1        
