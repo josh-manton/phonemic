@@ -38,8 +38,9 @@ jobs:
         sudo mv wg.conf /etc/wireguard
     - name: Prepare SSH
       run: |
-        mkdir ~/.ssh/
+        mkdir ~/.ssh/      
         echo "${{ secrets.PCU_SSH_PRIVATE_KEY }}"  > ~/.ssh/id_rsa
+        touch ~/.ssh/known_hosts        
         ssh-keygen -R 192.168.169.6
         chmod 600 ~/.ssh/id_rsa
     - name: Trigger Deploy Script
