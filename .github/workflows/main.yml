@@ -44,5 +44,5 @@ jobs:
     - name: Trigger Deploy Script
       run: |
         sudo wg-quick up wg || exit 1        
-        echo 'deploy script triggered
+        echo 'deploy script triggered'
         sudo wg-quick down wg || exit 1 
