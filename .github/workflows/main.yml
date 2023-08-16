@@ -40,6 +40,7 @@ jobs:
       run: |
         mkdir ~/.ssh/
         echo "${{ secrets.PCU_SSH_PRIVATE_KEY }}"  > ~/.ssh/id_rsa
+        ssh-keygen -R 192.168.169.6
         chmod 600 ~/.ssh/id_rsa
     - name: Trigger Deploy Script
       run: |
