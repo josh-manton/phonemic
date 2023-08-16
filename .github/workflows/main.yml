@@ -29,7 +29,6 @@ jobs:
         [Interface]
         PrivateKey = $privatekey
         Address=10.189.152.219/32
-        #DNS=10.189.152.1
         MTU=1412
         [Peer]
         PublicKey=$publickey
