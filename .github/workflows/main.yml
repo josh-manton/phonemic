@@ -25,11 +25,18 @@ jobs:
         endpoint: 'dj46kqhvz4e.d.firewalla.org:51820'      
       run: |
         sudo apt install wireguard
-        echo 'ip link add dev wg0 type wireguard'
-        sudo ip link add dev wg0 type wireguard
-        echo 'ip address add dev wg0 10.189.152.219/32'     
-        sudo ip address add dev wg0 10.189.152.219/32
-        sudo wg set wg0 listen-port 48123 private-key $privatekey peer $publickey allowed-ips 0.0.0.0/0 endpoint $endpoint
+        cat > wg.conf << EOT
+        [Interface]
+        PrivateKey = $privatekey
+        Address=10.189.152.219/32
+        DNS=10.189.152.1
+        MTU=1412
+        [Peer]
+        PublicKey=$publickey
+        Endpoint=$endpoint
+        AllowedIPs=0.0.0.0/0
+        EOT
+        sudo mv wg.conf /etc/wireguard
     - name: Prepare SSH
       run: |
         mkdir ~/.ssh/
@@ -37,6 +44,6 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
     - name: Trigger Deploy Script
       run: |
-        sudo ip link set up dev wg0        
+        sudo wg-quick up wg || exit 1        
         echo 'deploy script triggered
-        sudo ip link set up dev wg0  
+        sudo wg-quick down wg || exit 1 
