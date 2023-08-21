@@ -55,12 +55,15 @@ jobs:
       if: steps.verify_cfgs.outputs.cfgs_exist == 'true'    
       run: |
         echo "wg_connected=false" >> $GITHUB_OUTPUT        
-        sudo wg-quick up $WG_CMD && echo "wg_connected=true" >> $GITHUB_OUTPUT 
-    - name: SSH and Deploy
-      if: steps.wg_connect.outputs.wg_connected == 'true'    
-      run: |
-        ssh -i $HOME/$SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
-        whoami 
+        sudo wg-quick up $WG_CMD && echo "wg_connected=true" >> $GITHUB_OUTPUT
+    - name:  SSH and Deploy
+      if: steps.wg_connect.outputs.wg_connected == 'true' 
+      uses: D3rHase/ssh-command-action@v0.2.2
+      with:
+        host: $SSH_HOST
+        user: pyusr 
+        private_key: $SSH_PRIVATE_KEY    
+        command: whoami
     - name: Disconnect Wireguard
       if: always() && steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
