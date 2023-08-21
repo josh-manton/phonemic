@@ -48,12 +48,12 @@ jobs:
       #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Check Configurations Exist
       run: |    
-        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && $CONFIG_FILES_EXIST="true"  
+        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && echo "true" >> $CONFIG_FILES_EXIST
         echo "Configs Exist: $CONFIG_FILES_EXIST"
     - name: Wireguard Connect
       if: $CONFIG_FILES_EXIST == "true"
       run: |    
-        sudo wg-quick up $WG_CONF_PATH && $VPN_CONNECTED="true"                 
+        sudo wg-quick up $WG_CONF_PATH && echo "true" >> $VPN_CONNECTED                
         echo "Wireguard Connected: $VPN_CONNECTED"
     - name: SSH and Deploy
       if: $VPN_CONNECTED == "true"    
