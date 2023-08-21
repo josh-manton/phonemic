@@ -58,7 +58,7 @@ jobs:
         sudo wg-quick up $WG_CMD && echo "wg_connected=true" >> $GITHUB_OUTPUT
     - name:  SSH and Deploy
       if: steps.wg_connect.outputs.wg_connected == 'true' 
-      run: ssh -i $HOME/$SSH_PRIVATE_KEY_FILE pyusr@$SSH_HOST 'whoami'      
+      run: ssh -i $HOME/$SSH_PRIVATE_KEY_FILE pyusr@$SSH_HOST '/var/www/phonemic/deploy'      
     - name: Disconnect Wireguard
       if: always() && steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
