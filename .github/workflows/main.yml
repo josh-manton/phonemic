@@ -55,12 +55,12 @@ jobs:
         connected='false'
         sudo wg-quick up $WG_CONF_FILE && echo 'true' > $connected        
     - name: SSH and Deploy
-      if: steps.check_files.outputs.files_exists == 'true' && steps.wireguard_connect.connected == 'true'    
+      if: steps.wireguard_connect.connected == 'true'    
       run: |
         ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Terminate Wireguard
       # Always turminate vpn connection
-      if: always()
+      if:  steps.wireguard_connect.connected == 'true'       
       run: |
         sudo wg-quick down wg
