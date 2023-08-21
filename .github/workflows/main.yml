@@ -17,7 +17,7 @@ jobs:
     env: 
       WG_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
       WG_PUBLIC_KEY: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
-      WG_ENDPOINT: 'dj46kqhvz4e.d.firewalla.org:51820'
+      WG_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}      
       WG_CONF_FILE: '${{ github.workspace }}/wg.conf'
       SSH_HOST: ${{ secrets.SSH_HOST }}      
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -46,7 +46,7 @@ jobs:
         mkdir -p ~/.ssh/
         echo "$SSH_PRIVATE_KEY" > $SSH_PRIVATE_KEY_FILE        
         sudo chmod 600 $SSH_PRIVATE_KEY_FILE
-        echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
+      #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Check Configurations Exist
       uses: andstor/file-existence-action@v2
       with:
