@@ -18,16 +18,16 @@ jobs:
       WG_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
       WG_PUBLIC_KEY: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
       WG_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}      
-      WG_CONF_PATH: '${{ github.workspace }}/../wg.conf'
+      WG_CONF_FILE: 'wg.conf'
       SSH_HOST: ${{ secrets.SSH_HOST }}      
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-      SSH_PRIVATE_KEY_PATH: '${{ github.workspace }}/../sshpk.key'
+      SSH_PRIVATE_KEY_FILE: 'sshpk.key'
     steps:
     - name: Configure Wireguard    
       run: |
         sudo apt install wireguard
-        cat > wg.conf << EOT
+        cat > $WG_CONF_FILE << EOT
         [Interface]
         PrivateKey=$WG_PRIVATE_KEY
         Address=10.189.152.219/32
@@ -37,30 +37,30 @@ jobs:
         Endpoint=$WG_ENDPOINT
         AllowedIPs=192.168.169.0/24
         EOT
-        mv wg.conf $WG_CONF_PATH
+        sudo mv $WG_CONF_FILE /etc/wireguard/
     - name: Configure SSH     
       run: |
         mkdir -p ~/.ssh/
-        echo "$SSH_PRIVATE_KEY" > $SSH_PRIVATE_KEY_PATH      
-        sudo chmod 600 $SSH_PRIVATE_KEY_PATH
+        echo "$SSH_PRIVATE_KEY" > $HOME/$SSH_PRIVATE_KEY_FILE     
+        sudo chmod 600 $HOME/$SSH_PRIVATE_KEY_FILE      
       #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Verify Configurations
       id: verify_cfgs
       run: |
         echo "cfgs_exist=false" >> $GITHUB_OUTPUT
-        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && echo "cfgs_exist=true" >> $GITHUB_OUTPUT
+        ls /etc/wireguard/$WG_CONF_FILE $HOME/$SSH_PRIVATE_KEY_FILE && echo "cfgs_exist=true" >> $GITHUB_OUTPUT
     - name: Wireguard Connect
       id: wg_connect
       if: steps.verify_cfgs.outputs.cfgs_exist == 'true'    
       run: |
         echo "wg_connected=false" >> $GITHUB_OUTPUT        
-        sudo wg-quick up $WG_CONF_PATH && echo "wg_connected=true" >> $GITHUB_OUTPUT 
+        sudo wg-quick up && echo "wg_connected=true" >> $GITHUB_OUTPUT 
     - name: SSH and Deploy
       if: steps.wg_connect.outputs.wg_connected == 'true'    
       run: |
-        ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
+        ssh -i $HOME/$SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Disconnect Wireguard
       if: steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
-        sudo wg-quick down $WG_CONF_PATH
+        sudo wg-quick down
