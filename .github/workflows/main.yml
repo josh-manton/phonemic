@@ -54,7 +54,7 @@ jobs:
       if: steps.verify_cfgs.outputs.cfgs_exist == 'true'    
       run: |
         echo "wg_connected=false" >> $GITHUB_OUTPUT        
-        sudo wg-quick up && echo "wg_connected=true" >> $GITHUB_OUTPUT 
+        sudo wg-quick up $WG_CONF_FILE && echo "wg_connected=true" >> $GITHUB_OUTPUT 
     - name: SSH and Deploy
       if: steps.wg_connect.outputs.wg_connected == 'true'    
       run: |
@@ -63,4 +63,4 @@ jobs:
     - name: Disconnect Wireguard
       if: steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
-        sudo wg-quick down
+        sudo wg-quick down $WG_CONF_FILE
