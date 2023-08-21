@@ -45,22 +45,23 @@ jobs:
         sudo chmod 600 $SSH_PRIVATE_KEY_FILE
       #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Check Configurations Exist
-      uses: andstor/file-existence-action@v2
-      with:
-        files: "$WG_CONF_FILE, $SSH_PRIVATE_KEY_FILE"       
+      id: check_configs_exist
+      run: |
+        configs_exist='false'
+        ls $WG_CONF_FILE $SSH_PRIVATE_KEY_FILE && echo 'true' > configs_exist      
     - name: Wireguard Connect
       id: wireguard_connect
-      if: steps.check_files.outputs.files_exists == 'true'
+      if: steps.check_configs_exist.outputs.configs_exist == 'true'
       run: |
         connected='false'
         sudo wg-quick up $WG_CONF_FILE && echo 'true' > $connected        
     - name: SSH and Deploy
-      if: steps.wireguard_connect.connected == 'true'    
+      if: steps.wireguard_connect.outputs.connected == 'true'    
       run: |
         ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Terminate Wireguard
       # Always turminate vpn connection
-      if:  steps.wireguard_connect.connected == 'true'       
+      if:  steps.wireguard_connect.outputs.connected == 'true'       
       run: |
-        sudo wg-quick down wg
+        sudo wg-quick down $WG_CONF_FILE
