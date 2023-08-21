@@ -14,36 +14,57 @@ jobs:
   deploy:
     if: github.event.pull_request.merged == true || inputs.manual_run == true
     runs-on: ubuntu-latest
+    env: 
+      WG_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
+      WG_PUBLIC_KEY: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
+      WG_ENDPOINT: 'dj46kqhvz4e.d.firewalla.org:51820'
+      WG_CONF_FILE: '${{ github.workspace }}/wg.conf'
+      SSH_HOST: ${{ secrets.SSH_HOST }}      
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+      SSH_PRIVATE_KEY_FILE: '${{ github.workspace }}/sshpk.key'
     steps:
-    - run: |
-        echo The PR was merged
-    # Runs a single command using the runners shell
-    - name: Prepare Wireguard
-      env: 
-        privatekey: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
-        publickey: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
-        endpoint: 'dj46kqhvz4e.d.firewalla.org:51820'      
+    - name: Configure Wireguard    
       run: |
         sudo apt install wireguard
         cat > wg.conf << EOT
         [Interface]
-        PrivateKey = $privatekey
+        PrivateKey=$WG_PRIVATE_KEY
         Address=10.189.152.219/32
         MTU=1412
         [Peer]
-        PublicKey=$publickey
+        PublicKey=$WG_PUBLIC_KEY
         Endpoint=$endpoint
         AllowedIPs=192.168.169.0/24
         EOT
-        sudo mv wg.conf /etc/wireguard
-    - run: |
-        sudo wg-quick up wg || exit 1
-    - name: ssh-job
-      uses: nekiro/ssh-job@v1.0.3
+         echo "Wireguard Configuration File: $WG_CONF_FILE"
+         echo pwd
+         mv wg.conf $WG_CONF_FILE
+         echo ls $WG_CONF_FILE    
+    - name: Configure SSH     
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_PRIVATE_KEY" > $SSH_PRIVATE_KEY_FILE        
+        sudo chmod 600 $SSH_PRIVATE_KEY_FILE
+        echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
+    - name: Check Configurations Exist
+      uses: andstor/file-existence-action@v2
       with:
-        host: 192.168.169.6         
-        key: "${{ secrets.PCU_SSH_PRIVATE_KEY }}"            
-        user: pyusr
-        command: whoami
-    - run: |
+        files: "$WG_CONF_FILE, $SSH_PRIVATE_KEY_FILE"       
+    - name: Wireguard Connect
+      id: wireguard_connect
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: |
+        wg_connected=false
+        sudo wg-quick up $WG_CONF_FILE
+        sudo $?
+        echo wg-show
+    - name: SSH and Deploy
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: |
+        ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST" || exit 1
+      - name: Terminate Wireguard
+      # Always turminate vpn connection
+      if: always()
+      run: |
         sudo wg-quick down wg || exit 1 
