@@ -45,7 +45,6 @@ jobs:
         sudo chmod 600 $SSH_PRIVATE_KEY_PATH
       #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Check Configurations Exist
-      id: check_configs_exist
       run: |
         EXIST="false"
         echo "CONFIGS_EXIST={EXIST}" >> $GITHUB_ENV       
@@ -53,12 +52,11 @@ jobs:
         echo "CONFIGS_EXIST={EXIST}" >> $GITHUB_ENV       
         echo "Configs Exist: ${{ env.CONFIGS_EXIST }}"
     - name: Wireguard Connect
-      id: wireguard_connect
       if: ${{ env.CONFIGS_EXIST }} == "true"
       run: |
         VPN_CONNECTED="false"
         echo "VPN_CONNECTED={VPN_CONNECTED}" >> $GITHUB_ENV         
-        sudo wg-quick up $WG_CONF_FILE && echo "true" >> $VPN_CONNECTED
+        sudo wg-quick up $WG_CONF_PATH && echo "true" >> $VPN_CONNECTED
         echo "VPN_CONNECTED={VPN_CONNECTED}" >> $GITHUB_ENV            
         echo "Wireguard Connected: ${{ env.VPN_CONNECTED }}
     - name: SSH and Deploy
@@ -69,4 +67,4 @@ jobs:
     - name: Terminate Wireguard
       if: ${{ env.VPN_CONNECTED }} == 'true'          
       run: |
-        sudo wg-quick down $WG_CONF_FILE
+        sudo wg-quick down $WG_CONF_PATH
