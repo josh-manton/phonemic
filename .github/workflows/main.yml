@@ -34,10 +34,10 @@ jobs:
         MTU=1412
         [Peer]
         PublicKey=$WG_PUBLIC_KEY
-        Endpoint=$endpoint
+        Endpoint=$WG_ENDPOINT
         AllowedIPs=192.168.169.0/24
         EOT
-        echo "Wireguard Configuration File: $WG_CONF_FILE"
+        mv wg.conf $WG_CONF_FILE
     - name: Configure SSH     
       run: |
         mkdir -p ~/.ssh/
@@ -47,21 +47,22 @@ jobs:
     - name: Check Configurations Exist
       id: check_configs_exist
       run: |
-        configs_exist='false'
-        ls $WG_CONF_FILE $SSH_PRIVATE_KEY_FILE && echo 'true' > configs_exist      
+        exist='false'
+        ls $WG_CONF_FILE $SSH_PRIVATE_KEY_FILE && echo 'true' > $exist
+        echo "Configurations Exist: $exist"
     - name: Wireguard Connect
       id: wireguard_connect
-      if: steps.check_configs_exist.outputs.configs_exist == 'true'
+      if: steps.check_configs_exist.outputs.exist == 'true'
       run: |
         connected='false'
-        sudo wg-quick up $WG_CONF_FILE && echo 'true' > $connected        
+        sudo wg-quick up $WG_CONF_FILE && echo 'true' > $connected
+        echo "Wireguard Connected: $connected"
     - name: SSH and Deploy
       if: steps.wireguard_connect.outputs.connected == 'true'    
       run: |
         ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Terminate Wireguard
-      # Always turminate vpn connection
       if:  steps.wireguard_connect.outputs.connected == 'true'       
       run: |
         sudo wg-quick down $WG_CONF_FILE
