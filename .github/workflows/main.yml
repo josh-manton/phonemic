@@ -1,4 +1,4 @@
-name: Deploy on merge of pull request
+name: Deploy on Merge of PR
 on:
   pull_request_target:
     types:
