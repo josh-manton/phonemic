@@ -45,22 +45,22 @@ jobs:
         sudo chmod 600 $SSH_PRIVATE_KEY_PATH
       #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Verify Configurations
-      id: verify_confs
+      id: verify_cfgs
       run: |
-        echo "confs_exist=false" >> $GITHUB_OUTPUT
-        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && "confs_exist=true" >> $GITHUB_OUTPUT
+        echo "cfgs_exist=false" >> $GITHUB_OUTPUT
+        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && "cfgs_exist=true" >> $GITHUB_OUTPUT
     - name: Wireguard Connect
       id: wg_connect
-      if: steps.verify_confs.confs_exist == "true"    
+      if: steps.verify_cfgs.outputs.cfgs_exist == 'true'    
       run: |
         echo "wg_connected=false" >> $GITHUB_OUTPUT        
         sudo wg-quick up $WG_CONF_PATH && echo "wg_connected=true" >> $GITHUB_OUTPUT 
     - name: SSH and Deploy
-      if: steps.wg_connect.wg_connected == "true"    
+      if: steps.wg_connect.outputs.wg_connected == 'true'    
       run: |
         ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Disconnect Wireguard
-      if: steps.wg_connect.wg_connected == "true" 
+      if: steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
         sudo wg-quick down $WG_CONF_PATH
