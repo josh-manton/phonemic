@@ -18,11 +18,11 @@ jobs:
       WG_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
       WG_PUBLIC_KEY: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
       WG_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}      
-      WG_CONF_FILE: '${{ github.workspace }}/wg.conf'
+      WG_CONF_FILE: '${{ github.workspace }}/../wg.conf'
       SSH_HOST: ${{ secrets.SSH_HOST }}      
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-      SSH_PRIVATE_KEY_FILE: '${{ github.workspace }}/sshpk.key'
+      SSH_PRIVATE_KEY_FILE: '${{ github.workspace }}/../sshpk.key'
     steps:
     - name: Configure Wireguard    
       run: |
