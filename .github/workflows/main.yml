@@ -62,6 +62,6 @@ jobs:
         ssh -i $HOME/$SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Disconnect Wireguard
-      if: steps.wg_connect.outputs.wg_connected == 'true' 
+      if: always() && steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
         sudo wg-quick down $WG_CMD
