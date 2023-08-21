@@ -17,8 +17,9 @@ jobs:
     env: 
       WG_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
       WG_PUBLIC_KEY: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
-      WG_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}      
-      WG_CONF_FILE: 'wg.conf'
+      WG_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}
+      WG_CONF: 'wg'
+      WG_CONF_PATH: '/etc/wireguard/$WG_CONF.conf'
       SSH_HOST: ${{ secrets.SSH_HOST }}      
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
@@ -27,7 +28,7 @@ jobs:
     - name: Configure Wireguard    
       run: |
         sudo apt install wireguard
-        cat > $WG_CONF_FILE << EOT
+        cat > wg.tmp << EOT
         [Interface]
         PrivateKey=$WG_PRIVATE_KEY
         Address=10.189.152.219/32
@@ -37,7 +38,7 @@ jobs:
         Endpoint=$WG_ENDPOINT
         AllowedIPs=192.168.169.0/24
         EOT
-        sudo mv $WG_CONF_FILE /etc/wireguard/
+        sudo mv wg.tmp $WG_CONF_PATH    
     - name: Configure SSH     
       run: |
         mkdir -p ~/.ssh/
