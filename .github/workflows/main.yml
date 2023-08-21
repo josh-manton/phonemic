@@ -18,8 +18,8 @@ jobs:
       WG_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
       WG_PUBLIC_KEY: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
       WG_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}
-      WG_CONF: 'wg'
-      WG_CONF_PATH: '/etc/wireguard/wg.conf'
+      WG_CMD: 'wg'
+      WG_CONF_FILE: '/etc/wireguard/wg.conf'
       SSH_HOST: ${{ secrets.SSH_HOST }}      
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
@@ -38,7 +38,7 @@ jobs:
         Endpoint=$WG_ENDPOINT
         AllowedIPs=192.168.169.0/24
         EOT
-        sudo mv wg.tmp $WG_CONF_PATH    
+        sudo mv wg.tmp $WG_CONF_FILE   
     - name: Configure SSH     
       run: |
         mkdir -p ~/.ssh/
@@ -49,13 +49,13 @@ jobs:
       id: verify_cfgs
       run: |
         echo "cfgs_exist=false" >> $GITHUB_OUTPUT
-        sudo ls /etc/wireguard/$WG_CONF_FILE $HOME/$SSH_PRIVATE_KEY_FILE && echo "cfgs_exist=true" >> $GITHUB_OUTPUT
+        sudo ls $WG_CONF_FILE $HOME/$SSH_PRIVATE_KEY_FILE && echo "cfgs_exist=true" >> $GITHUB_OUTPUT
     - name: Wireguard Connect
       id: wg_connect
       if: steps.verify_cfgs.outputs.cfgs_exist == 'true'    
       run: |
         echo "wg_connected=false" >> $GITHUB_OUTPUT        
-        sudo wg-quick up $WG_CONF_FILE && echo "wg_connected=true" >> $GITHUB_OUTPUT 
+        sudo wg-quick up $WG_CMD && echo "wg_connected=true" >> $GITHUB_OUTPUT 
     - name: SSH and Deploy
       if: steps.wg_connect.outputs.wg_connected == 'true'    
       run: |
@@ -64,4 +64,4 @@ jobs:
     - name: Disconnect Wireguard
       if: steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
-        sudo wg-quick down $WG_CONF_FILE
+        sudo wg-quick down $WG_CMD
