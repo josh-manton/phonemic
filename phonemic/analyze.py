@@ -18,7 +18,7 @@ def analyze_words():
         pword = pros.Word(word)
         ent = dict()
         ent['word'] = pword.token
-        ent['deploy'] = 'test123'
+        ent['deploy'] = 'pr_test_wf_and_restart'
         ent['lang'] = pword.lang
         ent['tts_engine'] = pword.config['en_TTS_ENGINE']
         ent['orth'] = pword.sylls_text
