@@ -37,10 +37,7 @@ jobs:
         Endpoint=$endpoint
         AllowedIPs=192.168.169.0/24
         EOT
-         echo "Wireguard Configuration File: $WG_CONF_FILE"
-         echo pwd
-         mv wg.conf $WG_CONF_FILE
-         echo ls $WG_CONF_FILE    
+        echo "Wireguard Configuration File: $WG_CONF_FILE"
     - name: Configure SSH     
       run: |
         mkdir -p ~/.ssh/
