@@ -44,7 +44,7 @@ jobs:
         mkdir -p ~/.ssh/
         echo "$SSH_PRIVATE_KEY" > $HOME/$SSH_PRIVATE_KEY_FILE     
         sudo chmod 600 $HOME/$SSH_PRIVATE_KEY_FILE      
-      #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
+        echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Verify Configurations
       id: verify_cfgs
       run: |
