@@ -60,7 +60,7 @@ jobs:
       if: steps.wg_connect.outputs.wg_connected == 'true'    
       run: |
         ssh -i $HOME/$SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
-        echo whoami
+        whoami 
     - name: Disconnect Wireguard
       if: always() && steps.wg_connect.outputs.wg_connected == 'true' 
       run: |
