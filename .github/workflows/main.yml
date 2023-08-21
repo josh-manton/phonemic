@@ -48,7 +48,7 @@ jobs:
       id: verify_cfgs
       run: |
         echo "cfgs_exist=false" >> $GITHUB_OUTPUT
-        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && "cfgs_exist=true" >> $GITHUB_OUTPUT
+        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && echo "cfgs_exist=true" >> $GITHUB_OUTPUT
     - name: Wireguard Connect
       id: wg_connect
       if: steps.verify_cfgs.outputs.cfgs_exist == 'true'    
