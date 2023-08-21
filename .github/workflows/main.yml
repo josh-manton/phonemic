@@ -18,11 +18,11 @@ jobs:
       WG_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
       WG_PUBLIC_KEY: ${{ secrets.WIREGUARD_PUBLIC_KEY }}
       WG_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}      
-      WG_CONF_FILE: '${{ github.workspace }}/../wg.conf'
+      WG_CONF_PATH: '${{ github.workspace }}/../wg.conf'
       SSH_HOST: ${{ secrets.SSH_HOST }}      
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-      SSH_PRIVATE_KEY_FILE: '${{ github.workspace }}/../sshpk.key'
+      SSH_PRIVATE_KEY_PATH: '${{ github.workspace }}/../sshpk.key'
     steps:
     - name: Configure Wireguard    
       run: |
@@ -37,32 +37,36 @@ jobs:
         Endpoint=$WG_ENDPOINT
         AllowedIPs=192.168.169.0/24
         EOT
-        mv wg.conf $WG_CONF_FILE
+        mv wg.conf $WG_CONF_PATH
     - name: Configure SSH     
       run: |
         mkdir -p ~/.ssh/
-        echo "$SSH_PRIVATE_KEY" > $SSH_PRIVATE_KEY_FILE        
-        sudo chmod 600 $SSH_PRIVATE_KEY_FILE
+        echo "$SSH_PRIVATE_KEY" > $SSH_PRIVATE_KEY_PATH      
+        sudo chmod 600 $SSH_PRIVATE_KEY_PATH
       #echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts        
     - name: Check Configurations Exist
       id: check_configs_exist
       run: |
-        exist='false'
-        ls $WG_CONF_FILE $SSH_PRIVATE_KEY_FILE && echo 'true' > $exist
-        echo "Configurations Exist: $exist"
+        EXIST="false"
+        echo "CONFIGS_EXIST={EXIST}" >> $GITHUB_ENV       
+        ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && EXIST="true"
+        echo "CONFIGS_EXIST={EXIST}" >> $GITHUB_ENV       
+        echo "Configs Exist: ${{ env.CONFIGS_EXIST }}"
     - name: Wireguard Connect
       id: wireguard_connect
-      if: steps.check_configs_exist.outputs.exist == 'true'
+      if: ${{ env.CONFIGS_EXIST }} == "true"
       run: |
-        connected='false'
-        sudo wg-quick up $WG_CONF_FILE && echo 'true' > $connected
-        echo "Wireguard Connected: $connected"
+        VPN_CONNECTED="false"
+        echo "VPN_CONNECTED={VPN_CONNECTED}" >> $GITHUB_ENV         
+        sudo wg-quick up $WG_CONF_FILE && echo "true" >> $VPN_CONNECTED
+        echo "VPN_CONNECTED={VPN_CONNECTED}" >> $GITHUB_ENV            
+        echo "Wireguard Connected: ${{ env.VPN_CONNECTED }}
     - name: SSH and Deploy
-      if: steps.wireguard_connect.outputs.connected == 'true'    
+      if: ${{ env.VPN_CONNECTED }} == 'true'    
       run: |
         ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Terminate Wireguard
-      if:  steps.wireguard_connect.outputs.connected == 'true'       
+      if: ${{ env.VPN_CONNECTED }} == 'true'          
       run: |
         sudo wg-quick down $WG_CONF_FILE
