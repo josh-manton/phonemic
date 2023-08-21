@@ -51,16 +51,16 @@ jobs:
         ls $WG_CONF_PATH $SSH_PRIVATE_KEY_PATH && echo "true" >> $CONFIG_FILES_EXIST
         echo "Configs Exist: $CONFIG_FILES_EXIST"
     - name: Wireguard Connect
-      if: $CONFIG_FILES_EXIST == "true"
+      if: ${{ CONFIG_FILES_EXIST }} == "true"
       run: |    
         sudo wg-quick up $WG_CONF_PATH && echo "true" >> $VPN_CONNECTED                
         echo "Wireguard Connected: $VPN_CONNECTED"
     - name: SSH and Deploy
-      if: $VPN_CONNECTED == "true"    
+      if: ${{ VPN_CONNECTED }} == "true"    
       run: |
         ssh -i $SSH_PRIVATE_KEY_FILE "pyusr@$SSH_HOST"
         echo whoami
     - name: Terminate Wireguard
-      if: $VPN_CONNECTED == "true" 
+      if: ${{ VPN_CONNECTED }} == "true" 
       run: |
         sudo wg-quick down $WG_CONF_PATH
